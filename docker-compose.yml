@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    depends_on:
+      - postgres
+      - redis
+      - geoserver
+
+  worker:
+    build: .
+    command: celery -A app.worker.ingestion_task worker --loglevel=info
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgis/postgis:15-3.4
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  geoserver:
+    image: oscarfonts/geoserver:2.23.0
+    environment:
+      GEOSERVER_ADMIN_USER: ${GEOSERVER_USER}
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_PASSWORD}
+    ports:
+      - "8080:8080"
+    volumes:
+      - geoserver_data:/opt/geoserver/data_dir
+
+volumes:
+  postgres_data:
+  geoserver_data:
+  

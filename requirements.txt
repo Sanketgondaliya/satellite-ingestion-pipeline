@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-multipart
+boto3
+psycopg2-binary
+sqlalchemy
+gsconfig-py3
+Pillow
+python-dotenv
+requests
+GDAL
+numpy
+celery
+redis
+GeoAlchemy2
